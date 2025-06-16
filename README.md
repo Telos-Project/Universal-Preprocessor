@@ -4,11 +4,13 @@
 
 ***Syntax is Optional.***
 
-The universal preprocessor, or PUP, is a text preprocessing system inspired by PHP.
+The universal preprocessor, or PUP, is a modular, language-agnostic text preprocessing and
+templating system.
 
-The major difference is that the tags, or in universal preprocessor terms, directives, may contain
-code in any language, may be embedded in any other language, and may overwrite surrounding code
-instead of merely printing into it.
+The essential method by which the Universal Preprocessor operates is inspired by PHP, but the major
+difference is that the tags, or in universal preprocessor terms, directives, may contain code in
+any language, may be embedded in any other language, and may overwrite surrounding code instead of
+merely printing into it.
 
 The universal preprocessor then simultaneously fulfils the functionality of PHP, but expands it to
 any language, and functionally supports the full syntax overwriting of Racket.
