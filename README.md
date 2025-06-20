@@ -41,11 +41,11 @@ array as a compiled program.
 
 Explicit Language Declaration:
 
-    (] JS [> # JS Code <)
+    (] JS [> // JS Code <)
 
 Implicit Language Detection:
 
-    (> # JS Code, thus the language will be detected as JS <)
+    (> // JS Code, thus the language will be detected as JS <)
 
 ### 2.3 - Examples
 
