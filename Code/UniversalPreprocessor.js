@@ -49,7 +49,7 @@ var universalPreprocessor = {
 			)[0];
 
 			if(language == null)
-				return null;
+				continue;
 
 			let tempLength = newText.length;
 
