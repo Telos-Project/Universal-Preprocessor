@@ -1,4 +1,4 @@
-module.exports = [
+var pupLangs = [
 	{
 		match: (language, text) => {
 
@@ -45,3 +45,6 @@ module.exports = [
 		}
 	}
 ];
+
+if(typeof module == "object")
+	module.exports = pupLangs;
