@@ -22,9 +22,10 @@ any language, and functionally supports the full syntax overwriting of Racket.
 When the preprocessor is executed, the code within the directives will execute in the order that
 the directives are placed.
 
-The code within the directive operates as a function that recieves two unnamed arguments, the first
-being the current contents of the text file with all preprocessor directives removed, and the
-second being the index of the directive within said cropped text.
+The code within the directive operates as a function that recieves three arguments, which are
+unnamed by default, the first being the current contents of the text file with all preprocessor
+directives removed, the second being the index of the directive within said cropped text, and the
+third being an array of miscellanous string arguments that were passed in by the environment.
 
 Anything written to stdout (that is, anything that would normally be printed to the console),
 will be injected where the directive is placed. However, if the code, executing as a function,
@@ -37,7 +38,9 @@ Furthermore, the code for a directive, in addition to returning a string, may al
 array, which can allow the Universal Preprocessor to function as a compiler by saving said byte
 array as a compiled program.
 
-### 2.2 - Preprocessor Directive Structure
+### 2.2 - Format
+
+### 2.2.1 - Preprocessor Directive Structure
 
 Explicit Language Declaration:
 
@@ -46,6 +49,16 @@ Explicit Language Declaration:
 Implicit Language Detection:
 
     (> // JS Code, thus the language will be detected as JS <)
+
+### 2.2.2 - Comments
+
+Any directive using explicit language declaration where the declared language is unrecognized may
+function as a comment. The recommended language declaration string for a comment is a tilde, shown
+as follows:
+
+    (] ~ [> This is a comment. <)
+
+Thus, the universal preprocessor may function as a language agnostic commenting system.
 
 ### 2.3 - Examples
 

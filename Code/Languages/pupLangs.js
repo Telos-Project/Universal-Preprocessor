@@ -25,7 +25,7 @@ var pupLangs = [
 				eval(
 					"let tempFunc=function(text, index, args){" +
 					directive +
-					"};value=tempFunc(text, index, arguments);"
+					"};value=tempFunc(text, index, args);"
 				);
 				
 				console.log = tempWrite;
