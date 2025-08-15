@@ -1,9 +1,9 @@
 var universalPreprocessor = {
-	preprocess: (languages, text, args) => {
+	preprocess: (text, args) => {
 
 		args = args != null ? args : [];
 
-		let tokens = text.split("\r").join("").split(/(\(\]|\(\>|\[\>|\<\))/);
+		let tokens = text.split("\r").join("").split(/(\(\]|\[\>|\<\))/);
 		let directives = [];
 
 		let newText = "";
@@ -23,19 +23,6 @@ var universalPreprocessor = {
 				i += 4;
 			}
 
-			else if(tokens[i] == "(>") {
-
-				directives.push(
-					{
-						language: "*",
-						content: tokens[i + 1].trim(),
-						index: newText.length
-					}
-				)
-
-				i += 2;
-			}
-
 			else
 				newText += tokens[i];
 		}
@@ -44,25 +31,53 @@ var universalPreprocessor = {
 
 		for(let i = 0; i < directives.length; i++) {
 
-			let language = languages.filter(item =>
-				item.match(directives[i].language, directives[i].content)
-			)[0];
-
-			if(language == null)
+			if(directives[i].language == "~")
 				continue;
 
+			let language = null;
+
+			try {
+				language = use(directives[i].language);
+			}
+
+			catch(error) {
+				continue;
+			}
+
+			if(typeof language != "object")
+				continue;
+
+			if(language.process == null)
+				continue;
+
+			let index = directives[i].index + indexShift;
 			let tempLength = newText.length;
 
-			newText =
+			let value =
 				language.process(
-					args,
 					directives[i].content,
 					newText,
-					directives[i].index + indexShift
+					index,
+					args
 				);
 
-			if(Array.isArray(newText))
-				return newText;
+			if(typeof value != "object")
+				continue;
+
+			value.options = value.options != null ? value.options : { };
+
+			if(value.options.export)
+				return value;
+
+			newText = value.options.overwrite ?
+				"" + value.value :
+				`${
+					newText.substring(0, index)
+				}${
+					value.value
+				}${
+					newText.substring(index)
+				}`;
 			
 			indexShift += newText.length - tempLength;
 		}

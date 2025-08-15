@@ -22,17 +22,17 @@ any language, and functionally supports the full syntax overwriting of Racket.
 When the preprocessor is executed, the code within the directives will execute in the order that
 the directives are placed.
 
-The code within the directive operates as a function that recieves three arguments, which are
+The code within the directive operates as a function that receives three arguments, which are
 unnamed by default, the first being the current contents of the text file with all preprocessor
 directives removed, the second being the index of the directive within said cropped text, and the
-third being an array of miscellanous string arguments that were passed in by the environment.
+third being an array of miscellaneous string arguments that were passed in by the environment.
 
 Anything written to stdout (that is, anything that would normally be printed to the console),
 will be injected where the directive is placed. However, if the code, executing as a function,
 returns a string, said string will overwrite the text file entirely.
 
-The language used within a preprocessor directive may either be explicity declared or implicitly
-detected.
+The language used within a preprocessor directive shall be defined by referencing a plugin capable
+of processing it.
 
 Furthermore, the code for a directive, in addition to returning a string, may also return a byte
 array, which can allow the Universal Preprocessor to function as a compiler by saving said byte
@@ -42,19 +42,12 @@ array as a compiled program.
 
 ### 2.2.1 - Preprocessor Directive Structure
 
-Explicit Language Declaration:
-
-    (] JS [> // JS Code <)
-
-Implicit Language Detection:
-
-    (> // JS Code, thus the language will be detected as JS <)
+    (] universal-preprocessor/langJS [> // JS Code <)
 
 ### 2.2.2 - Comments
 
-Any directive using explicit language declaration where the declared language is unrecognized may
-function as a comment. The recommended language declaration string for a comment is a tilde, shown
-as follows:
+Any directive where the declared language is unrecognized may function as a comment. The
+recommended language declaration string for a comment is a tilde, shown as follows:
 
     (] ~ [> This is a comment. <)
 
@@ -67,7 +60,7 @@ Thus, the universal preprocessor may function as a language agnostic commenting 
 The following code:
 
     Hello
-    (] JS [>
+    (] universal-preprocessor/langJS [>
 
     	for(let i = 0; i < 10; i++)
     		console.log("ABC:", i, "\n");
@@ -95,7 +88,7 @@ Will be preprocessed to:
 The following code:
 
     Hello
-    (] JS [> console.log("INDEX:", arguments[1]); <)
+    (] universal-preprocessor/langJS [> console.log("INDEX:", arguments[1]); <)
     World
 
 Will be preprocessed to:
@@ -109,7 +102,7 @@ Will be preprocessed to:
 The following code:
 
     Hello
-    (] JS [> return arguments[0].split("o").join("0"); <)
+    (] universal-preprocessor/langJS [> return arguments[0].split("o").join("0"); <)
     World
 
 Will be preprocessed to:
@@ -130,7 +123,7 @@ Said package may be used as a command via npx, using the following format:
 For example, if one had in a directory a file named "demo.txt", with the following content:
 
     Hello
-    (] JS [>
+    (] universal-preprocessor/langJS [>
 
     	for(let i = 0; i < 10; i++)
     		console.log("ABC:", i, "\n");
@@ -159,31 +152,27 @@ Then a file named "output.txt" would appear in the same directory:
 
 #### 2.4.1 - Extension
 
-Currently, this implementation of the universal preprocessor only supports JavaScript as a
-directive language.
+A plugin for the implementation of the Universal Preprocessor provided herein shall be implemented
+as a CommonJS module, which shall export an object containing a "process" function.
 
-This functionality may be expanded upon by adding a third command line argument specifying the
-alias or URL of a CommonJS module which exports a list of directive objects.
+The process function shall be invoked when processing a directive to which its module applies, and
+shall take four arguments. The first argument shall be a string containing the code of the
+directive's body, and the latter three arguments shall be, in order, the arguments to be passed to
+said code.
 
-Directive objects have a match function and a process function.
-
-The match function takes two string arguments, the first being the language specified in a
-directive and the second being the text body of the same directive, and returns true if the
-directive object corresponds to the language of said directive.
-
-The process function takes a string array argument, followed by two string arguments, followed by a
-numerical argument. The string array specifies miscellaneous command arguments passed to the
-universal preprocessor. The first string argument specifies the text body of a directive. The
-second string argument specifies the text in which said directive is embedded, and the numerical
-argument specifies the character index at which said directive appears in said text. The process
-function returns a string or numerical array representing the resulting text following the
-execution of said directive.
+The process function shall return an object containing a "value" field, along with an optional
+"options" field. The value field shall contain the string output of the executed code to inject
+into or overwrite onto the code from which the directive was sourced, or a number array to export
+as binary. The options field, if present, shall contain boolean flags. An "overwrite" field in the
+options object, set to true, indicates that the string in the value field is to overwrite the
+source code rather than be injected into it. An "export" field in the options object, set to true,
+indicates that the value field is to be exported as is as the result of the process, and should be
+used when the value field is an array.
 
 #### 2.4.2 - Arguments
 
-Any argument added to the command line invocation of the univeral preprocessor beyond those
-previously discussed shall be passed to directives for miscellaneous usage. If one wishes to employ
-such arguments without loading additional directive objects, specify the directive module alias as
-"null", as shown in this example:
+Any argument added to the command line invocation of the universal preprocessor beyond those
+previously discussed shall be passed to directives for miscellaneous usage, as shown in this
+example:
 
-    npx universal-preprocessor demo.txt output.txt null arg1 arg2
+    npx universal-preprocessor demo.txt output.txt arg1 arg2
